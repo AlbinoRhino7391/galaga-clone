@@ -4,24 +4,56 @@ const ctx = canvas.getContext('2d');
 
 // WHAT OBJECTS DO I NEED TO MAKE THE GAME
 // Player spaceship properties
-const playerShip = {
-    x: canvas.width / 2,
-    y: canvas.height - 50,
-    width: 30,
-    height: 20,
-    color: "blue"
+const player = {
+    x: 0, // X-coordinate of the player spaceship
+    y: 0, // Y-coordinate of the player spaceship
+    speed: 5, // Speed of the player spaceship
+    width: 50, // Width of the player spaceship
+    height: 50 // Height of the player spaceship
 };
 
 // Player controls
+const controls = {
+    left: false, // Is the left arrow key pressed?
+    right: false, // Is the right arrow key pressed?
+    space: false // Is the spacebar pressed?
+};
 
 // Enemy spaceship properties
+const enemy = {
+    x: 0, // X-coordinate of the enemy spaceship
+    y: 0, // Y-coordinate of the enemy spaceship
+    speed: 2, // Speed of the enemy spaceship
+    width: 40, // Width of the enemy spaceship
+    height: 40 // Height of the enemy spaceship
+};
 
 // Bullets properties
+const bullets = [];
 
 // Game state
+let gameRunning = true;
 
 // Event listeners for player controls
+document.addEventListener("keydown", function(event) {
+    if (event.key === "ArrowLeft") {
+      controls.left = true;
+    } else if (event.key === "ArrowRight") {
+      controls.right = true;
+    } else if (event.key === " ") {
+      controls.space = true;
+    }
+});
 
+document.addEventListener("keyup", function(event) {
+    if (event.key === "ArrowLeft") {
+      controls.left = false;
+    } else if (event.key === "ArrowRight") {
+      controls.right = false;
+    } else if (event.key === " ") {
+      controls.space = false;
+    }
+});
 
 // HOW WILL THE GAME WORK
 // Initialize the game
