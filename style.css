@@ -1,0 +1,14 @@
+/* CSS styles for the game canvas */
+#game-canvas {
+    background-color: lightslategray;
+    border: 1px solid white;
+  }
+  
+/* CSS styles for the scoreboard */
+#scoreboard {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: white;
+    font-size: 20px;
+}

@@ -1,0 +1,1 @@
+This is solely a clone of galaga, a rudementary clone but a clone none the less.
