@@ -4,29 +4,70 @@ const ctx = canvas.getContext('2d');
 
 // WHAT OBJECTS DO I NEED TO MAKE THE GAME
 // Player spaceship properties
-const playerShip = {
-    x: canvas.width / 2,
-    y: canvas.height - 50,
-    width: 30,
-    height: 20,
-    color: "blue"
+const player = {
+    x: 0, // X-coordinate of the player spaceship
+    y: 0, // Y-coordinate of the player spaceship
+    speed: 3, // Speed of the player spaceship
+    width: 50, // Width of the player spaceship
+    height: 50 // Height of the player spaceship
 };
 
 // Player controls
+const controls = {
+    left: false, // Is the left arrow key pressed?
+    right: false, // Is the right arrow key pressed?
+    space: false // Is the spacebar pressed?
+};
 
 // Enemy spaceship properties
+const enemy = {
+    x: 0, // X-coordinate of the enemy spaceship
+    y: 0, // Y-coordinate of the enemy spaceship
+    speed: 1, // Speed of the enemy spaceship
+    width: 40, // Width of the enemy spaceship
+    height: 40 // Height of the enemy spaceship
+};
 
 // Bullets properties
+const bullets = [];
 
 // Game state
+let gameRunning = true;
 
 // Event listeners for player controls
+document.addEventListener("keydown", function(event) {
+    if (event.key === "ArrowLeft") {
+      controls.left = true;
+    } else if (event.key === "ArrowRight") {
+      controls.right = true;
+    } else if (event.key === " ") {
+      controls.space = true;
+    }
+});
 
+document.addEventListener("keyup", function(event) {
+    if (event.key === "ArrowLeft") {
+      controls.left = false;
+    } else if (event.key === "ArrowRight") {
+      controls.right = false;
+    } else if (event.key === " ") {
+      controls.space = false;
+    }
+});
 
 // HOW WILL THE GAME WORK
 // Initialize the game
-
-// Create the enemy spaceships
+function initializeGame() {
+  // Initialize player spaceship position
+  player.x = canvas.width / 2 - player.width / 2; // Set player spaceship to the center horizontally
+  player.y = canvas.height - player.height - 10; // Set player spaceship near the bottom vertically
+  
+  // Reset game state
+  gameRunning = true;
+  
+  // Start the game loop
+  gameLoop();
+}
 
 // show the scoreboard
 
@@ -54,7 +95,7 @@ function gameLoop(){
   detectCollisions();
 
   // Update the scoreboard
-  updateScoreboard();
+  //updateScoreboard();
 
   // Request next frame
   requestAnimationFrame(gameLoop);
@@ -62,17 +103,30 @@ function gameLoop(){
 
 // Draw the player spaceship
 function drawPlayer() {
-  
+  ctx.fillStyle = "#0000ff"; // Set the color of the player spaceship
+  ctx.fillRect(player.x, player.y, player.width, player.height); // Draw the player spaceship rectangle
 }
 
 // Draw the enemy spaceships
 function drawEnemies() {
-  
 }
 
 // Move the player spaceship
 function movePlayer() {
- 
+  if (controls.left) {
+    // Move left
+    player.x -= player.speed;
+  } else if (controls.right) {
+    // Move right
+    player.x += player.speed;
+  }
+
+  // Limit the player spaceship within the canvas bounds
+  if (player.x < 0) {
+    player.x = 0;
+  } else if (player.x + player.width > canvas.width) {
+    player.x = canvas.width - player.width;
+  }
 }
 
 // Shoot a bullet
