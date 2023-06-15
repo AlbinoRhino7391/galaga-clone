@@ -20,13 +20,7 @@ const controls = {
 };
 
 // Enemy spaceship properties
-const enemy = {
-    x: 0, // X-coordinate of the enemy spaceship
-    y: 0, // Y-coordinate of the enemy spaceship
-    speed: 1, // Speed of the enemy spaceship
-    width: 40, // Width of the enemy spaceship
-    height: 40 // Height of the enemy spaceship
-};
+const enemies = []; // Array to store enemy spaceships
 
 // Bullets properties
 const bullets = [];
@@ -65,12 +59,29 @@ function initializeGame() {
   // Reset game state
   gameRunning = true;
   
+  // Generate enemy spaceships
+  generateEnemies();
+
   // Start the game loop
   gameLoop();
 }
 
-// show the scoreboard
+// Generate enemy spaceships
+function generateEnemies() {
+  const enemyCount = 5; // Number of enemies to generate
 
+  for (let i = 0; i < enemyCount; i++) {
+    const newEnemy = {
+      x: Math.random() * (canvas.width - 40),
+      y: Math.random() * (canvas.height / 2),
+      speed: 1,
+      width: 40,
+      height: 40
+    };
+
+    enemies.push(newEnemy);
+  }
+}
 
 // Game loop
 function gameLoop(){
@@ -109,6 +120,12 @@ function drawPlayer() {
 
 // Draw the enemy spaceships
 function drawEnemies() {
+  ctx.fillStyle = "#ff0000";
+
+  for (let i = 0; i < enemies.length; i++) {
+    const enemy = enemies[i];
+    ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+  }
 }
 
 // Move the player spaceship
