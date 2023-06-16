@@ -19,6 +19,25 @@ const controls = {
     space: false // Is the spacebar pressed?
 };
 
+class Enemy {
+  constructor(x, y, speed, width, height) {
+      this.x = x;
+      this.y = y;
+      this.speed = speed;
+      this.width = width;
+      this.height = height;
+  }
+
+  draw() {
+      ctx.fillStyle = "#ff0000";
+      ctx.fillRect(this.x, this.y, this.width, this.height);
+  }
+
+  move() {
+      this.y += this.speed;
+  }
+}
+
 // Enemy spaceship properties
 const enemies = []; // Array to store enemy spaceships
 
@@ -71,13 +90,13 @@ function generateEnemies() {
   const enemyCount = 5; // Number of enemies to generate
 
   for (let i = 0; i < enemyCount; i++) {
-    const newEnemy = {
-      x: Math.random() * (canvas.width - 40),
-      y: Math.random() * (canvas.height / 2),
-      speed: 1,
-      width: 40,
-      height: 40
-    };
+    const newEnemy = new Enemy(
+      Math.random() * (canvas.width - 40),
+      Math.random() * (canvas.height / 2),
+      1,
+      40,
+      40
+    );
 
     enemies.push(newEnemy);
   }
@@ -120,11 +139,9 @@ function drawPlayer() {
 
 // Draw the enemy spaceships
 function drawEnemies() {
-  ctx.fillStyle = "#ff0000";
-
   for (let i = 0; i < enemies.length; i++) {
-    const enemy = enemies[i];
-    ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+      const enemy = enemies[i];
+      enemy.draw();
   }
 }
 
