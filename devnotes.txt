@@ -1,0 +1,6 @@
+1. The collision detection code checks four conditions to determine if the rectangles are overlapping:
+    -The left side of obj1 (the player spaceship) is to the left of the right side of obj2 (the enemy spaceship). This means that obj1 is not completely on the right of obj2.
+    -The right side of obj1 is to the right of the left side of obj2. This means that obj1 is not completely on the left of obj2.
+    -The top side of obj1 is above the bottom side of obj2. This means that obj1 is not completely below obj2.
+    -The bottom side of obj1 is below the top side of obj2. This means that obj1 is not completely above obj2.
+

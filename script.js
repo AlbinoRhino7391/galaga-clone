@@ -19,6 +19,7 @@ const controls = {
     space: false // Is the spacebar pressed?
 };
 
+// Enemy Spaceship class
 class Enemy {
   constructor(x, y, speed, width, height) {
       this.x = x;
@@ -38,11 +39,8 @@ class Enemy {
   }
 }
 
-// Enemy spaceship properties
-const enemies = []; // Array to store enemy spaceships
-
-// Bullets properties
-const bullets = [];
+// Array to store enemy spaceships
+const enemies = [];
 
 // Game state
 let gameRunning = true;
@@ -90,14 +88,31 @@ function generateEnemies() {
   const enemyCount = 5; // Number of enemies to generate
 
   for (let i = 0; i < enemyCount; i++) {
-    const newEnemy = new Enemy(
-      Math.random() * (canvas.width - 40),
-      Math.random() * (canvas.height / 2),
-      1,
-      40,
-      40
-    );
+    let newEnemy;
+    let collisionDetected;
 
+    do {
+      // Generate new enemy properties
+      const x = Math.random() * (canvas.width - 40);
+      const y = Math.random() * (canvas.height / 2);
+      const speed = 1;
+      const width = 40;
+      const height = 40;
+
+      // Create new enemy
+      newEnemy = new Enemy(x, y, speed, width, height);
+
+      // Check for collisions with existing enemies
+      collisionDetected = false;
+      for (let j = 0; j < enemies.length; j++) {
+        if (isCollision(newEnemy, enemies[j])) {
+          collisionDetected = true;
+          break;
+        }
+      }
+    } while (collisionDetected);
+
+    // Add new enemy to the array
     enemies.push(newEnemy);
   }
 }
@@ -165,27 +180,32 @@ function movePlayer() {
 
 // Shoot a bullet
 function shootBullet() {
- 
-} 
+  // TODO: Implement bullet shooting logic here
+}
 
 // Move the bullets
 function moveBullets() {
- 
+  // TODO: Implement bullet movement logic here
 }
 
 // Draw the bullets
 function drawBullets() {
-    
+  // TODO: Implement bullet drawing logic here
 }
 
 // Detect collisions between bullets and enemies
 function detectCollisions() {
-  
+  // TODO: Implement collision detection logic here
 }
 
-// Check if two objects are colliding
+// Check if two objects are colliding - see dev notes for more verbose expalination.
 function isCollision(obj1, obj2) {
- 
+  return (
+    obj1.x < obj2.x + obj2.width &&
+    obj1.x + obj1.width > obj2.x &&
+    obj1.y < obj2.y + obj2.height &&
+    obj1.y + obj1.height > obj2.y
+  );
 }
 
 // Start the game
