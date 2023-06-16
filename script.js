@@ -19,11 +19,35 @@ const controls = {
     space: false // Is the spacebar pressed?
 };
 
-// Enemy spaceship properties
-const enemies = []; // Array to store enemy spaceships
+// Enemy Spaceship class
+class Enemy {
+  constructor(x, y, speed, width, height) {
+    this.x = x;
+    this.y = y;
+    this.speed = speed;
+    this.width = width;
+    this.height = height;
+    this.direction = 1; // 1 represents moving to the right, -1 represents moving to the left
+  }
 
-// Bullets properties
-const bullets = [];
+  draw() {
+    ctx.fillStyle = "#ff0000";
+    ctx.fillRect(this.x, this.y, this.width, this.height);
+  }
+
+  move() {
+    this.x += this.speed * this.direction;
+
+    // Check if enemy hits the canvas borders
+    if (this.x + this.width >= canvas.width || this.x <= 0) {
+      this.direction *= -1; // Reverse the direction
+      this.y += (this.height/2); // Move the enemy down by its height
+    }
+  }
+}
+
+// Array to store enemy spaceships
+const enemies = [];
 
 // Game state
 let gameRunning = true;
@@ -71,14 +95,31 @@ function generateEnemies() {
   const enemyCount = 5; // Number of enemies to generate
 
   for (let i = 0; i < enemyCount; i++) {
-    const newEnemy = {
-      x: Math.random() * (canvas.width - 40),
-      y: Math.random() * (canvas.height / 2),
-      speed: 1,
-      width: 40,
-      height: 40
-    };
+    let newEnemy;
+    let collisionDetected;
 
+    do {
+      // Generate new enemy properties
+      const x = Math.random() * (canvas.width - 40);
+      const y = Math.random() * (canvas.height / 2);
+      const speed = 1;
+      const width = 40;
+      const height = 40;
+
+      // Create new enemy
+      newEnemy = new Enemy(x, y, speed, width, height);
+
+      // Check for collisions with existing enemies
+      collisionDetected = false;
+      for (let j = 0; j < enemies.length; j++) {
+        if (isCollision(newEnemy, enemies[j])) {
+          collisionDetected = true;
+          break;
+        }
+      }
+    } while (collisionDetected);
+
+    // Add new enemy to the array
     enemies.push(newEnemy);
   }
 }
@@ -91,8 +132,12 @@ function gameLoop(){
   // Draw the player spaceship
   drawPlayer();
 
-  // Draw the enemy spaceships
-  drawEnemies();
+  // Move and draw the enemy spaceships
+  for (let i = 0; i < enemies.length; i++) {
+    const enemy = enemies[i];
+    enemy.move();
+    enemy.draw();
+  }
 
   // Move the player spaceship
   movePlayer();
@@ -120,11 +165,9 @@ function drawPlayer() {
 
 // Draw the enemy spaceships
 function drawEnemies() {
-  ctx.fillStyle = "#ff0000";
-
   for (let i = 0; i < enemies.length; i++) {
-    const enemy = enemies[i];
-    ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+      const enemy = enemies[i];
+      enemy.draw();
   }
 }
 
@@ -148,27 +191,32 @@ function movePlayer() {
 
 // Shoot a bullet
 function shootBullet() {
- 
-} 
+  // TODO: Implement bullet shooting logic here
+}
 
 // Move the bullets
 function moveBullets() {
- 
+  // TODO: Implement bullet movement logic here
 }
 
 // Draw the bullets
 function drawBullets() {
-    
+  // TODO: Implement bullet drawing logic here
 }
 
 // Detect collisions between bullets and enemies
 function detectCollisions() {
-  
+  // TODO: Implement collision detection logic here
 }
 
-// Check if two objects are colliding
+// Check if two objects are colliding - see dev notes for more verbose expalination.
 function isCollision(obj1, obj2) {
- 
+  return (
+    obj1.x < obj2.x + obj2.width &&
+    obj1.x + obj1.width > obj2.x &&
+    obj1.y < obj2.y + obj2.height &&
+    obj1.y + obj1.height > obj2.y
+  );
 }
 
 // Start the game
