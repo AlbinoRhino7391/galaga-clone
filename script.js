@@ -22,20 +22,27 @@ const controls = {
 // Enemy Spaceship class
 class Enemy {
   constructor(x, y, speed, width, height) {
-      this.x = x;
-      this.y = y;
-      this.speed = speed;
-      this.width = width;
-      this.height = height;
+    this.x = x;
+    this.y = y;
+    this.speed = speed;
+    this.width = width;
+    this.height = height;
+    this.direction = 1; // 1 represents moving to the right, -1 represents moving to the left
   }
 
   draw() {
-      ctx.fillStyle = "#ff0000";
-      ctx.fillRect(this.x, this.y, this.width, this.height);
+    ctx.fillStyle = "#ff0000";
+    ctx.fillRect(this.x, this.y, this.width, this.height);
   }
 
   move() {
-      this.y += this.speed;
+    this.x += this.speed * this.direction;
+
+    // Check if enemy hits the canvas borders
+    if (this.x + this.width >= canvas.width || this.x <= 0) {
+      this.direction *= -1; // Reverse the direction
+      this.y += (this.height/2); // Move the enemy down by its height
+    }
   }
 }
 
@@ -125,8 +132,12 @@ function gameLoop(){
   // Draw the player spaceship
   drawPlayer();
 
-  // Draw the enemy spaceships
-  drawEnemies();
+  // Move and draw the enemy spaceships
+  for (let i = 0; i < enemies.length; i++) {
+    const enemy = enemies[i];
+    enemy.move();
+    enemy.draw();
+  }
 
   // Move the player spaceship
   movePlayer();
