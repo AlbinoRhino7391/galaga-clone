@@ -4,3 +4,7 @@
     -The top side of obj1 is above the bottom side of obj2. This means that obj1 is not completely below obj2.
     -The bottom side of obj1 is below the top side of obj2. This means that obj1 is not completely above obj2.
 
+2. The direction property is added to the Enemy class to keep track of the current movement direction. By default, it is set to 1 to indicate moving to the right.
+In the move() method, the x position of the enemy is updated based on the current direction and speed.
+After updating the x position, we check if the enemy has hit the canvas borders. If the enemy reaches the right border (this.x + this.width >= canvas.width) or the left border (this.x <= 0), we reverse the direction by multiplying it by -1.
+Additionally, when the enemy hits the border, we move it down by its height (this.y += this.height). This ensures that the enemies move down one row when they hit the border, creating a downward movement pattern.
