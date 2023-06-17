@@ -16,7 +16,8 @@ const player = {
 const controls = {
     left: false, // Is the left arrow key pressed?
     right: false, // Is the right arrow key pressed?
-    space: false // Is the spacebar pressed?
+    space: false, // Is the spacebar pressed?
+    canShoot: true // Can the player shoot a bullet?
 };
 
 // Enemy Spaceship class
@@ -48,30 +49,36 @@ class Enemy {
 
 // Array to store enemy spaceships
 const enemies = [];
+ 
+// Array to store bullets
+const bullets = [];
 
 // Game state
 let gameRunning = true;
 
 // Event listeners for player controls
-document.addEventListener("keydown", function(event) {
-    if (event.key === "ArrowLeft") {
-      controls.left = true;
-    } else if (event.key === "ArrowRight") {
-      controls.right = true;
-    } else if (event.key === " ") {
+function handleKeyDown(event) {
+  if (event.key === "ArrowLeft") {
+    controls.left = true;
+  } else if (event.key === "ArrowRight") {
+    controls.right = true;
+  } else if (event.key === " ") {
+    if (!controls.space) {
       controls.space = true;
     }
-});
+  }
+}
 
-document.addEventListener("keyup", function(event) {
-    if (event.key === "ArrowLeft") {
-      controls.left = false;
-    } else if (event.key === "ArrowRight") {
-      controls.right = false;
-    } else if (event.key === " ") {
-      controls.space = false;
-    }
-});
+function handleKeyUp(event) {
+  if (event.key === "ArrowLeft") {
+    controls.left = false;
+  } else if (event.key === "ArrowRight") {
+    controls.right = false;
+  } else if (event.key === " ") {
+    controls.space = false;
+    controls.canShoot = true;
+  }
+}
 
 // HOW WILL THE GAME WORK
 // Initialize the game
@@ -85,6 +92,10 @@ function initializeGame() {
   
   // Generate enemy spaceships
   generateEnemies();
+
+  //add eventListener with the event and cooresponding functions as arguments
+  document.addEventListener("keydown", handleKeyDown);
+  document.addEventListener("keyup", handleKeyUp);
 
   // Start the game loop
   gameLoop();
@@ -125,35 +136,13 @@ function generateEnemies() {
 }
 
 // Game loop
-function gameLoop(){
-  // Clear the canvas
+function gameLoop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  // Draw the player spaceship
   drawPlayer();
-
-  // Move and draw the enemy spaceships
-  for (let i = 0; i < enemies.length; i++) {
-    const enemy = enemies[i];
-    enemy.move();
-    enemy.draw();
-  }
-
-  // Move the player spaceship
   movePlayer();
-
-  // Spawn bullets
-
-  // Move the bullets
-  moveBullets();
-
-  // Detect collisions between bullets and enemies
+  drawEnemies();
+  handleBullets();
   detectCollisions();
-
-  // Update the scoreboard
-  //updateScoreboard();
-
-  // Request next frame
   requestAnimationFrame(gameLoop);
 }
 
@@ -161,14 +150,6 @@ function gameLoop(){
 function drawPlayer() {
   ctx.fillStyle = "#0000ff"; // Set the color of the player spaceship
   ctx.fillRect(player.x, player.y, player.width, player.height); // Draw the player spaceship rectangle
-}
-
-// Draw the enemy spaceships
-function drawEnemies() {
-  for (let i = 0; i < enemies.length; i++) {
-      const enemy = enemies[i];
-      enemy.draw();
-  }
 }
 
 // Move the player spaceship
@@ -189,24 +170,73 @@ function movePlayer() {
   }
 }
 
+// Draw and move the enemy spaceships
+function drawEnemies() {
+  for (const enemy of enemies) {
+    enemy.move();
+    enemy.draw();
+  }
+}
+
+// Handle bullets (creation, movement, and deletion)
+function handleBullets() {
+  if (controls.space && controls.canShoot) {
+    shootBullet();
+    controls.canShoot = false;
+  }
+
+  moveBullets();
+  drawBullets();
+}
+
 // Shoot a bullet
 function shootBullet() {
-  // TODO: Implement bullet shooting logic here
+  const bullet = {
+    x: player.x + player.width / 2, // X-coordinate of the bullet (starts at the center of the player spaceship)
+    y: player.y, // Y-coordinate of the bullet (starts at the top of the player spaceship)
+    speed: 10, // Speed of the bullet
+    width: 10, // Width of the bullet
+    height: 10 // Height of the bullet
+  };
+  bullets.push(bullet);
 }
 
 // Move the bullets
 function moveBullets() {
-  // TODO: Implement bullet movement logic here
+  for (let i = bullets.length - 1; i >= 0; i--) {
+    const bullet = bullets[i];
+    bullet.y -= bullet.speed;
+
+    // Remove bullets that have gone off the canvas
+    if (bullet.y + bullet.height < 0) {
+      bullets.splice(i, 1);
+    }
+  }
 }
 
 // Draw the bullets
 function drawBullets() {
-  // TODO: Implement bullet drawing logic here
+  for (const bullet of bullets) {
+    ctx.fillStyle = "#ffff00"; // Set the color of the bullets
+    ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height); // Draw the bullet rectangle
+  }
 }
 
 // Detect collisions between bullets and enemies
 function detectCollisions() {
-  // TODO: Implement collision detection logic here
+  for (let i = bullets.length - 1; i >= 0; i--) {
+    const bullet = bullets[i];
+
+    for (let j = enemies.length - 1; j >= 0; j--) {
+      const enemy = enemies[j];
+
+      if (isCollision(bullet, enemy)) {
+        bullets.splice(i, 1);
+        enemies.splice(j, 1);
+        break; // Exit the inner loop since the bullet can collide with only one enemy
+      }
+    }
+  }
 }
 
 // Check if two objects are colliding - see dev notes for more verbose expalination.
