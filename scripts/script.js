@@ -53,6 +53,9 @@ const enemies = [];
 // Array to store bullets
 const bullets = [];
 
+// Initialize score
+let score = 0;
+
 // Game state
 let gameRunning = true;
 
@@ -89,6 +92,10 @@ function initializeGame() {
   
   // Reset game state
   gameRunning = true;
+
+  // Start score at 0 for the beginning of the game.
+  score = 0; // Set the initial score to 0
+  document.getElementById('score').textContent = "Score: " + score; // Update the "score" element
   
   // Generate enemy spaceships
   generateEnemies();
@@ -233,6 +240,8 @@ function detectCollisions() {
       if (isCollision(bullet, enemy)) {
         bullets.splice(i, 1);
         enemies.splice(j, 1);
+        score++; // Increase the score
+        document.getElementById('score').textContent = "Score: " + score; // Update the "score" element
         break; // Exit the inner loop since the bullet can collide with only one enemy
       }
     }
