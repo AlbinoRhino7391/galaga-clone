@@ -16,6 +16,8 @@ const player = {
 const controls = {
     left: false, // Is the left arrow key pressed?
     right: false, // Is the right arrow key pressed?
+    up: false, // Is the up arrow key pressed?
+    down: false, // Is the down arrow key pressed?
     space: false, // Is the spacebar pressed?
     canShoot: true // Can the player shoot a bullet?
 };
@@ -29,6 +31,7 @@ class Enemy {
     this.width = width;
     this.height = height;
     this.direction = 1; // 1 represents moving to the right, -1 represents moving to the left
+    this.canShoot = true; //this indicates if the enemy can shoot
   }
 
   draw() {
@@ -42,16 +45,44 @@ class Enemy {
     // Check if enemy hits the canvas borders
     if (this.x + this.width >= canvas.width || this.x <= 0) {
       this.direction *= -1; // Reverse the direction
-      this.y += (this.height/2); // Move the enemy down by its height
+      this.y += this.height / 2; // Move the enemy down by its height
+    }
+
+    // Shoot a bullet randomly every 3 seconds
+    if (this.canShoot && Math.random() < 0.003) {
+      this.shootBullet();
+      this.canShoot = false; // Prevent shooting for a period of time
+      setTimeout(() => {
+        this.canShoot = true;
+      }, 3000); // Allow shooting again after 3 seconds
     }
   }
+
+  shootBullet() {
+    const bullet = {
+      x: this.x + this.width / 2, // X-coordinate of the bullet (starts at the center of the enemy spaceship)
+      y: this.y + this.height, // Y-coordinate of the bullet (starts below the enemy spaceship)
+      speed: 5, // Speed of the bullet
+      width: 5, // Width of the bullet
+      height: 15, // Height of the bullet
+    };
+    enemyBullets.push(bullet);
+  }
 }
+
 
 // Array to store enemy spaceships
 const enemies = [];
  
 // Array to store bullets
 const bullets = [];
+const enemyBullets = [];
+
+// Initialize score
+let score = 0;
+
+//Initialize the wave number
+let wave = 0;
 
 // Game state
 let gameRunning = true;
@@ -62,6 +93,10 @@ function handleKeyDown(event) {
     controls.left = true;
   } else if (event.key === "ArrowRight") {
     controls.right = true;
+  } else if (event.key === "ArrowUp") {
+    controls.up = true;
+  } else if (event.key === "ArrowDown") {
+    controls.down = true;
   } else if (event.key === " ") {
     if (!controls.space) {
       controls.space = true;
@@ -74,6 +109,10 @@ function handleKeyUp(event) {
     controls.left = false;
   } else if (event.key === "ArrowRight") {
     controls.right = false;
+  } else if (event.key === "ArrowUp") {
+    controls.up = false;
+  } else if (event.key === "ArrowDown") {
+    controls.down = false;
   } else if (event.key === " ") {
     controls.space = false;
     controls.canShoot = true;
@@ -89,6 +128,14 @@ function initializeGame() {
   
   // Reset game state
   gameRunning = true;
+
+  // Start score at 0 for the beginning of the game.
+  score = 0; // Set the initial score to 0
+  document.getElementById('score').textContent = "Score: " + score; // Update the "score" element
+  
+  // Start the game at wave 1
+  wave = 0; // Set the initial wave number
+  document.getElementById('wave').textContent = "Wave: " + wave; // Update the "wave" element
   
   // Generate enemy spaceships
   generateEnemies();
@@ -120,6 +167,13 @@ function generateEnemies() {
       // Create new enemy
       newEnemy = new Enemy(x, y, speed, width, height);
 
+      //speed increase only happens up to wave 10.
+      if (wave <= 10) {
+        newEnemy.speed = speed * Math.pow(1.1,wave-1);
+      } else {
+        newEnemy.speed = speed * Math.pow(1.1,10-1);;
+      }
+
       // Check for collisions with existing enemies
       collisionDetected = false;
       for (let j = 0; j < enemies.length; j++) {
@@ -133,15 +187,25 @@ function generateEnemies() {
     // Add new enemy to the array
     enemies.push(newEnemy);
   }
+   //increment the wave every time new enemies are generated.
+   wave++; // Increment the wave number
+   document.getElementById('wave').textContent = "Wave: " + wave; // Update the "wave" element
 }
 
 // Game loop
 function gameLoop() {
+  if (!gameRunning) {
+    // Game over, stop the game loop
+    return;
+  }
+  
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawPlayer();
   movePlayer();
   drawEnemies();
   handleBullets();
+  moveEnemyBullets();
+  drawEnemyBullets();
   detectCollisions();
   requestAnimationFrame(gameLoop);
 }
@@ -162,11 +226,25 @@ function movePlayer() {
     player.x += player.speed;
   }
 
+  if (controls.up) {
+    // Move up
+    player.y -= player.speed;
+  } else if (controls.down) {
+    // Move down
+    player.y += player.speed;
+  }
+
   // Limit the player spaceship within the canvas bounds
   if (player.x < 0) {
     player.x = 0;
   } else if (player.x + player.width > canvas.width) {
     player.x = canvas.width - player.width;
+  }
+
+  if (player.y < 0) {
+    player.y = 0;
+  } else if (player.y + player.height > canvas.height) {
+    player.y = canvas.height - player.height;
   }
 }
 
@@ -214,11 +292,32 @@ function moveBullets() {
   }
 }
 
+// Move the enemy bullets
+function moveEnemyBullets() {
+  for (let i = enemyBullets.length - 1; i >= 0; i--) {
+    const bullet = enemyBullets[i];
+    bullet.y += bullet.speed;
+
+    // Remove bullets that have gone off the canvas
+    if (bullet.y + bullet.height > canvas.height) {
+      enemyBullets.splice(i, 1);
+    }
+  }
+}
+
 // Draw the bullets
 function drawBullets() {
   for (const bullet of bullets) {
     ctx.fillStyle = "#ffff00"; // Set the color of the bullets
     ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height); // Draw the bullet rectangle
+  }
+}
+
+// Draw the enemy bullets
+function drawEnemyBullets() {
+  for (const bullet of enemyBullets) {
+    ctx.fillStyle = "#ff3131"; // Set the color of the enemy bullets
+    ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height); // Draw the enemy bullet rectangle
   }
 }
 
@@ -233,9 +332,27 @@ function detectCollisions() {
       if (isCollision(bullet, enemy)) {
         bullets.splice(i, 1);
         enemies.splice(j, 1);
+        score++; // Increase the score
+        document.getElementById('score').textContent = "Score: " + score; // Update the "score" element
         break; // Exit the inner loop since the bullet can collide with only one enemy
       }
     }
+  }
+  // Check collision between enemy bullets and the player
+  for (let i = enemyBullets.length - 1; i >= 0; i--) {
+    const bullet = enemyBullets[i];
+
+    if (isCollision(bullet, player)) {
+      enemyBullets.splice(i, 1);
+      decrementLives();
+      break;
+    }
+  }
+
+  // Check if there are no enemies left
+  if (enemies.length === 0) {
+    clearEnemies(); // Clear the enemies array
+    generateEnemies(); // Generate a new wave of enemies
   }
 }
 
@@ -247,6 +364,38 @@ function isCollision(obj1, obj2) {
     obj1.y < obj2.y + obj2.height &&
     obj1.y + obj1.height > obj2.y
   );
+}
+
+// Reset the enemy array to 0.
+function clearEnemies() {
+  enemies.length = 0; // Clear the enemies array
+}
+
+// Decrement player lives
+function decrementLives() {
+  let lives = parseInt(document.getElementById('lives').textContent.split(': ')[1]);
+
+  if (lives > 0) {
+    lives--;
+    document.getElementById('lives').textContent = "Lives: " + lives;
+  }
+
+  if (lives === 0) {
+    endGame(); // Implement this function to handle the game over logic
+  }
+}
+
+function endGame() {
+  gameRunning = false; // Set gameRunning to false to stop the game loop
+
+  // Clear the canvas
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Display "Game Over" message
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "bold 36px Arial";
+  ctx.textAlign = "center";
+  ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2);
 }
 
 // Start the game
