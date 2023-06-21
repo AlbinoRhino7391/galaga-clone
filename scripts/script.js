@@ -5,21 +5,21 @@ const ctx = canvas.getContext('2d');
 // WHAT OBJECTS DO I NEED TO MAKE THE GAME
 // Player spaceship properties
 const player = {
-    x: 0, // X-coordinate of the player spaceship
-    y: 0, // Y-coordinate of the player spaceship
-    speed: 3, // Speed of the player spaceship
-    width: 50, // Width of the player spaceship
-    height: 50 // Height of the player spaceship
+  x: 0, // X-coordinate of the player spaceship
+  y: 0, // Y-coordinate of the player spaceship
+  speed: 3, // Speed of the player spaceship
+  width: 50, // Width of the player spaceship
+  height: 50 // Height of the player spaceship
 };
 
 // Player controls
 const controls = {
-    left: false, // Is the left arrow key pressed?
-    right: false, // Is the right arrow key pressed?
-    up: false, // Is the up arrow key pressed?
-    down: false, // Is the down arrow key pressed?
-    space: false, // Is the spacebar pressed?
-    canShoot: true // Can the player shoot a bullet?
+  left: false, // Is the left arrow key pressed?
+  right: false, // Is the right arrow key pressed?
+  up: false, // Is the up arrow key pressed?
+  down: false, // Is the down arrow key pressed?
+  space: false, // Is the spacebar pressed?
+  canShoot: true // Can the player shoot a bullet?
 };
 
 // Enemy Spaceship class
@@ -72,7 +72,7 @@ class Enemy {
 
 
 // Array to store enemy spaceships
-const enemies = [];
+let enemies = [];
  
 // Array to store bullets
 const bullets = [];
@@ -84,8 +84,13 @@ let score = 0;
 //Initialize the wave number
 let wave = 0;
 
-// Game state
-let gameRunning = true;
+// Game states
+let gameStarted = false;
+let gameRunning = false;
+
+// Event listener for the start button
+const startButton = document.getElementById('start-button');
+startButton.addEventListener('click', startGame);
 
 // Event listeners for player controls
 function handleKeyDown(event) {
@@ -120,6 +125,21 @@ function handleKeyUp(event) {
 }
 
 // HOW WILL THE GAME WORK
+
+// Start the game
+function startGame() {
+  if (!gameStarted) {
+    //run the game
+    initializeGame();
+    gameLoop();
+    gameStarted = true;
+
+    // Hide the start button and remove its event listener
+    startButton.style.display = 'none';
+    startButton.removeEventListener('click', startGame);
+  }
+}
+
 // Initialize the game
 function initializeGame() {
   // Initialize player spaceship position
@@ -136,8 +156,13 @@ function initializeGame() {
   // Start the game at wave 1
   wave = 0; // Set the initial wave number
   document.getElementById('wave').textContent = "Wave: " + wave; // Update the "wave" element
+
+  // Start the game with 3 lives
+  lives = 3;
+  document.getElementById('lives').textContent = "Lives: " + lives;
   
   // Generate enemy spaceships
+  enemies = [];
   generateEnemies();
 
   //add eventListener with the event and cooresponding functions as arguments
@@ -198,7 +223,7 @@ function gameLoop() {
     // Game over, stop the game loop
     return;
   }
-  
+
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawPlayer();
   movePlayer();
@@ -387,6 +412,7 @@ function decrementLives() {
 
 function endGame() {
   gameRunning = false; // Set gameRunning to false to stop the game loop
+  gameStarted = false;
 
   // Clear the canvas
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -396,8 +422,9 @@ function endGame() {
   ctx.font = "bold 36px Arial";
   ctx.textAlign = "center";
   ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2);
-}
 
-// Start the game
-initializeGame();
-gameLoop();
+  //bring the start game button back
+  const startButton = document.getElementById("start-button");
+  startButton.style.display = "block";
+  startButton.addEventListener('click', startGame);
+}

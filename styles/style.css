@@ -2,10 +2,17 @@
 #game-canvas {
   background-color: lightgray;
   border: 1px solid black;
-  margin-top: 20px;
+  display: block;
+  margin: 20px auto;
 }
 
-  
+#start-button{
+  display: block;
+  margin: 20px auto;
+  padding: 10px 20px;
+  font-size: 18px;
+}
+
 /* CSS styles for the scoreboard */
 #scoreboard {
   position: fixed;
@@ -15,7 +22,13 @@
   color: black;
   font-size: 20px;
   display: flex;
+  padding: 0 15% ;
 }
 span{
   flex: 1;
+}
+
+header{
+  text-align: center;
+  margin-bottom: 10px;
 }
