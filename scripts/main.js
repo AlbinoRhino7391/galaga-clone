@@ -44,9 +44,16 @@ class Enemy {
 
     // Check if enemy hits the canvas borders
     if (this.x + this.width >= canvas.width || this.x <= 0) {
-      this.direction *= -1; // Reverse the direction
-      this.y += this.height / 2; // Move the enemy down by its height
+    this.direction *= -1; // Reverse the direction
+    this.y += this.height / 2; // Move the enemy down by its height
+
+    // Check if the enemy has passed the bottom bounds
+    if (this.y > canvas.height) {
+      // Reset the enemy position to the top of the canvas
+      this.y = -this.height;
+      this.x = Math.random() * (canvas.width - this.width);
     }
+  }
 
     // Shoot a bullet randomly every 3 seconds
     if (this.canShoot && Math.random() < 0.003) {
